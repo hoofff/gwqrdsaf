@@ -1,10 +1,13 @@
 import * as THREE from 'three';
+import{GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 window.addEventListener('load', function () {
   init();
 });
 
-function init() {
+async function init() {
+
   const canvas = document.querySelector('#canvas');
 
   const renderer = new THREE.WebGLRenderer({
@@ -20,7 +23,8 @@ function init() {
 
   const scene = new THREE.Scene();
 
-  scene.fog = nwe THREE.Fog();
+  scene.fog = new THREE.Fog(0xf0f0f0, 0.1, 500);
+  
   
   const camera = new THREE.PerspectiveCamera(
     75,
@@ -29,30 +33,53 @@ function init() {
     500,
   );
 
-  camera.position.set(0,25,150);
+  const controls = new OrbitControls(camera, renderer. domElement);
 
-  const waveGeometry = new THREE.PlaneGeometry(1500,1500,150,150);
-  const waveMaterial = new THREE.MeshStandardMaterial({
-    //wireframe:true,
-    color:'#9ccc65',
-  });
+  camera.position.set(8,70,150);
 
-  const wave = new THREE.Mesh(waveGeometry, waveMaterial);
-  wave.rotation.x = -Math.PI / 2;
+  controls.update();
 
+  function animate() {
 
-
-  for (let i = 0; i <waveGeometry.attributes.position.array.length; i += 3) {
-    waveGeometry.attributes.position.array[i + 2] += (Math.random() - 0.5) * 3;
+    requestAnimationFrame( animate );
+  
+    // 만약 controls.enableDamping, controls.autoRotate 둘 중 하나라도 true로 설정될 경우 필수로 호출되어야 합니다.
+    renderer.render( scene, camera );
+    
+    controls.update();
+  
+  
+  
   }
 
-  scene.add(wave);
+  animate();
 
-  const pointLight = new THREE.PointLight(0xffffff,1);
+  const gltfLoader = new GLTFLoader();
   
+  const gltf = await gltfLoader.loadAsync('./models/scene.gltf')
+  
+  const ship = gltf.scene;
+
+  ship.rotation.y = Math.PI / 3.5;
+  ship.position.y = 10;
+  ship.position.x = 2;
+  ship.position.z = 20;
+  ship.scale.set(4,4,4);
+
+  scene.add(ship);
+
+
+  const pointLight = new THREE.PointLight(0xffff8e1,2);
+
   pointLight.position.set(15,15,15);
 
   scene.add(pointLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffff8e1, 0.3);
+  
+  directionalLight.position.set(-15,15,15);
+
+  scene.add(directionalLight);
 
   render();
 
