@@ -43,7 +43,7 @@ async function init() {
 
     requestAnimationFrame( animate );
   
-    // 만약 controls.enableDamping, controls.autoRotate 둘 중 하나라도 true로 설정될 경우 필수로 호출되어야 합니다.
+    
     renderer.render( scene, camera );
     
     controls.update();
